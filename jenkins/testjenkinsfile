@@ -9,7 +9,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'mvn -B -e -Dmaven.repo.local=./m2 -DskipTests clean package'
-                sh 'ls -l target/'  // Debug: Check for JAR file
+                sh 'ls -l target/'  // List files in the target directory for debugging
             }
         }
         stage('Test') {
@@ -24,8 +24,8 @@ pipeline {
         }
         stage('Deliver') {
             steps {
-                // Update with the actual JAR name if different
-                sh 'java -jar target/<your-actual-jar-name>.jar'
+                // Replace with the actual JAR name after verifying from the 'ls' output
+                sh 'java -jar target/my-app-1.0.0.jar'
             }
         }
     }
