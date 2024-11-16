@@ -2,12 +2,14 @@ pipeline {
     agent {
         docker {
             image 'maven:3.9.2'
+            args '-v $HOME/.m2:/root/.m2'
         }
     }
     stages {
         stage('Build') {
             steps {
-                sh 'mvn -B -Dmaven.repo.local=./m2 -DskipTests clean package'
+                sh 'mvn -B -e -Dmaven.repo.local=./m2 -DskipTests clean package'
+                sh 'ls -l target/'  // Verify JAR file creation
             }
         }
         stage('Test') {
@@ -22,7 +24,8 @@ pipeline {
         }
         stage('Deliver') {
             steps {
-                sh './jenkins/scripts/deliver.sh'
+                // Replace 'my-application.jar' with the actual JAR name
+                sh 'java -jar target/my-application.jar'
             }
         }
     }
