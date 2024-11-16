@@ -24,8 +24,12 @@ pipeline {
         }
         stage('Deliver') {
             steps {
-                // Replace with the actual JAR name after verifying from the 'ls' output
-                sh 'java -jar target/my-app-1.0.0.jar'
+                // Dynamically run the built JAR using the project name and version
+                script {
+                    def name = sh(script: "mvn -q -DforceStdout help:evaluate -Dexpression=project.name", returnStdout: true).trim()
+                    def version = sh(script: "mvn -q -DforceStdout help:evaluate -Dexpression=project.version", returnStdout: true).trim()
+                    sh "java -jar target/${name}-${version}.jar"
+                }
             }
         }
     }
