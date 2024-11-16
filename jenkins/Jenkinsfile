@@ -27,7 +27,7 @@ pipeline {
             }
         stage('testEcho1') {
             steps {
-                sh echo 'test1 to poll'
+                sh 'echo "test1 to poll"'
             }
         }
     }
