@@ -5,16 +5,19 @@ pipeline {
             args '-v $HOME/.m2:/root/.m2'
         }
     }
+    environment {
+        MAVEN_OPTS = "-Dmaven.repo.local=/var/lib/jenkins/.m2/repository"
+    }
     stages {
         stage('Build') {
             steps {
-                sh 'mvn -B -e -Dmaven.repo.local=./m2 -DskipTests clean package'
+                sh 'mvn -B -e -Dmaven.repo.local=$MAVEN_OPTS clean package'
                 sh 'ls -l target/'  // List files in the target directory for debugging
             }
         }
         stage('Test') {
             steps {
-                sh 'mvn -Dmaven.repo.local=./m2 test'
+                sh 'mvn -Dmaven.repo.local=$MAVEN_OPTS test'
             }
             post {
                 always {
@@ -24,10 +27,9 @@ pipeline {
         }
         stage('Deliver') {
             steps {
-                // Dynamically run the built JAR using the project name and version
                 script {
-                    def name = sh(script: "mvn -q -DforceStdout help:evaluate -Dexpression=project.name", returnStdout: true).trim()
-                    def version = sh(script: "mvn -q -DforceStdout help:evaluate -Dexpression=project.version", returnStdout: true).trim()
+                    def name = sh(script: "mvn -q -DforceStdout help:evaluate -Dexpression=project.name -Dmaven.repo.local=$MAVEN_OPTS", returnStdout: true).trim()
+                    def version = sh(script: "mvn -q -DforceStdout help:evaluate -Dexpression=project.version -Dmaven.repo.local=$MAVEN_OPTS", returnStdout: true).trim()
                     sh "java -jar target/${name}-${version}.jar"
                 }
             }
